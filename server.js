@@ -1,0 +1,28 @@
+
+require('coffee-script/register');
+var express = require('express');
+var bodyParser = require('body-parser');
+var cors = require('cors');
+
+var port = process.env.PORT || 8080;
+
+var modelModules = [
+  require('./models')
+];
+
+require('./lib/db').init(modelModules, function(err, sequelize) {
+  if(err) { return console.log(err); }
+
+  // create API
+  var api = express();
+  // enable CORS
+  api.use(cors({maxAge: 86400}));
+  api.use(bodyParser.json());
+
+  require('./lib/app')(api, sequelize, sendMail);
+
+  app.listen(port, function() {
+    console.log('gandalf do magic on ' + port);
+  });
+
+});
