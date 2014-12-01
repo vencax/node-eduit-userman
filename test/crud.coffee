@@ -33,14 +33,17 @@ module.exports = (s, request, execenv) ->
       done()
 
   it "should create new item on right POST request", (done) ->
-    request.post "#{s}/user/", {form: _getObj()}, (err, res, body) ->
+    o = _getObj()
+    
+    request.post "#{s}/user/", {form: o}, (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 201
       res.should.be.json
       body = created = JSON.parse(body)
-      expected = _getObj()
-      expected.id = 1
-      body.should.eql expected
+      should.exist body.id
+      should.not.exist body.password
+      body.username.should.eql o.username
+      body.email.should.eql o.email
       done()
 
   it "must not create if already exists in DB", (done) ->
@@ -71,9 +74,11 @@ module.exports = (s, request, execenv) ->
     request "#{s}/user/#{created.id}/", (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 200
-      item = JSON.parse(body)
-      for k, v of created
-        item[k].should.eql v
+      body = JSON.parse(body)
+      should.exist body.id
+      should.not.exist body.password
+      body.username.should.eql created.username
+      body.email.should.eql created.email
       done()
 
   changed =

@@ -11,6 +11,7 @@ Resource = require('express-resource')
 
 port = process.env.PORT || 3333
 process.env.SERVER_SECRET='jfdlksjflaf'
+process.env.PWD_SALT='p9Tkr6uqxKtf'
 process.env.DONT_PROTECT=true
 
 execenv =
@@ -75,3 +76,4 @@ describe "app", ->
   baseurl = "http://localhost:#{port}"
 
   require('./crud')(baseurl, request, execenv)
+  require('./login')(baseurl, request, execenv)
