@@ -1,6 +1,7 @@
 
 require('coffee-script/register');
 var express = require('express');
+require('express-resource');
 var bodyParser = require('body-parser');
 var cors = require('cors');
 
