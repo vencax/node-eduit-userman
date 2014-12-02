@@ -6,7 +6,7 @@ module.exports = (grunt) ->
   grunt.initConfig
 
     coffeelint:
-      app: ["{,*/}*.coffee"]
+      app: ["{,*/}*.coffee", "lib/controllers/{,*/}*.coffee"]
 
     mochaTest:
       test:
