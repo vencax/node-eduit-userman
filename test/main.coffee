@@ -25,10 +25,10 @@ child_process_moc.hijack 'exec', (prog, pars, cb) ->
   setTimeout(() ->
     if cb
       cb(execenv.err || null, execenv.stdout || null, execenv.stderr || null)
-  , 100)
+  , 50)
   ret =
-    stdout: process.stdout
-    stderr: process.stderr
+    stdout: {pipe: (r) ->}
+    stderr: {pipe: (r) ->}
 
 _makeReq = (method, url, body, cb) ->
   if method in ["GET", "DELETE"]
@@ -100,3 +100,4 @@ describe "app", ->
   require('./group')(baseurl, _makeReq, execenv)
   require('./crud')(baseurl, _makeReq, execenv)
   require('./login')(baseurl, _makeReq, execenv)
+  require('./changepasswd')(baseurl, _makeReq, execenv)
