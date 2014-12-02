@@ -27,6 +27,16 @@ module.exports = (sequelize, DataTypes) ->
     timestamps: false
 
 
+  Group: sequelize.define "Group",
+    name:
+      type: DataTypes.STRING
+      allowNull: false
+      unique: true
+  ,
+    tableName: "auth_group"
+    timestamps: false
+
+
   SysUser: sequelize.define "SysUser",
     user_id:
       type: DataTypes.INTEGER

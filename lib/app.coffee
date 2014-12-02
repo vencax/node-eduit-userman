@@ -12,6 +12,7 @@ module.exports = (app, db, sendMail) ->
 
   # create the routes
   app.resource "user", require("./controllers/user")(db)
+  app.resource "group", require("./controllers/group")(db)
 
   # catcher of auth excepts
   app.use (err, req, res, next) ->
