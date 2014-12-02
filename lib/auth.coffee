@@ -6,7 +6,7 @@ pwdutils = require("./pwdutils")
 module.exports = (db) ->
 
   _sendError = (res) ->
-    res.send 401, "Wrong user or password"
+    res.status(401).send("WRONG_CREDENTIALS")
 
   return (req, res) ->
     return _sendError(res)  unless req.body.password
