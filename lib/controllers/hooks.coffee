@@ -90,13 +90,17 @@ module.exports = (db) ->
     or change samba pwd on change.
     ###
     homedir = path.join(HOMES_PATH, uname)
+    _do_create_home = () ->
+      mkHome = "cp -R /etc/skel #{homedir}"
+      mkHome += " && chown -R #{uname}:adm #{homedir}"
+      mkHome += " && chmod 770 #{homedir}"
+      _run_command(mkHome, cb)
+
     if not fs.existsSync(homedir)
       _run_command "mv #{homedir} /tmp", (err) ->
-        mkHome = "cp -R /etc/skel #{homedir}"
-        mkHome += " && chown -R #{uname}:adm #{homedir}"
-        mkHome += " && chmod 770 #{homedir}"
-        _run_command(mkHome, cb)
-
+        _do_create_home()
+    else
+      _do_create_home()
 
   _delSambaUserAndHome = (uname) ->
     ###
@@ -122,7 +126,7 @@ module.exports = (db) ->
       addSmbUsr += " | smbpasswd -s -a #{user.username}"
       _run_command(addSmbUsr)
       console.log("user #{user.username} synced")
-    , 2000
+    , 500
 
 
   afterUpdate: (user) ->
@@ -132,8 +136,8 @@ module.exports = (db) ->
       _syncSysUser(user, sysuser)
 
       if user.rawpwd and ISSUE_SAMBA_COMMANDS
-        chSmbPass = "(echo #{rawpwd}; echo #{rawpwd}) | smbpasswd -s #{uname}"
-        _run_command(chSmbPass)
+        _run_command "(echo #{user.rawpwd}; echo #{user.rawpwd})" +
+          " | smbpasswd -s #{user.username}"
 
       if ISSUE_SAMBA_COMMANDS
         # change realname of da samba user

@@ -4,6 +4,13 @@ should = require('should')
 
 module.exports = (s, request, execenv) ->
 
+  beforeEach (done) ->
+    # console.log("\n... Resetting execenv")
+    # for i in execenv.res
+    #   console.log i[0]
+    execenv.res = []
+    done()
+
   _getObj = ->
     user =
       username: 'gandalf'
@@ -45,6 +52,7 @@ module.exports = (s, request, execenv) ->
 
   it "should create new user on right POST request", (done) ->
     o = _getObj()
+    this.timeout(0)
 
     request 'POST', "#{s}/user/", o, (err, res, body) ->
       return done err if err
@@ -56,8 +64,14 @@ module.exports = (s, request, execenv) ->
       body.username.should.eql o.username
       body.email.should.eql o.email
       setTimeout () ->
+        execenv.res.length.should.eql 3
+        execenv.res[0][0].should.eql "mv /home/gandalf /tmp"
+        execenv.res[1][0].should.eql "(echo #{o.password};" +
+          " echo #{o.password}) | smbpasswd -s -a #{o.username}"
+        execenv.res[2][0].should.eql "cp -R /etc/skel /home/gandalf" +
+          " && chown -R gandalf:adm /home/gandalf && chmod 770 /home/gandalf"
         done()
-      , 400
+      , 800
 
   it "must not create if already exists in DB", (done) ->
     h = _getObj()
@@ -65,6 +79,7 @@ module.exports = (s, request, execenv) ->
     request 'POST', "#{s}/user/", h, (err, res) ->
       return done err if err
       res.statusCode.should.eql 400
+      execenv.res.should.eql []
       done()
 
   it "shall return the loaded list", (done) ->
@@ -94,7 +109,6 @@ module.exports = (s, request, execenv) ->
       body.email.should.eql created.email
       done()
 
-
   changed =
     last_name: "The white!!"
 
@@ -105,6 +119,8 @@ module.exports = (s, request, execenv) ->
       body = JSON.parse(body)
       body.last_name.should.eql changed.last_name
       setTimeout () ->
+        execenv.res[0][0].should.eql 'pdbedit --modify -u gandalf' +
+          ' --fullname "gandalf The white!!"'
         done()
       , 400
 
@@ -112,16 +128,23 @@ module.exports = (s, request, execenv) ->
     request 'PUT', "#{s}/user/22222/", changed, (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 404
+      execenv.res.should.eql []
       done()
 
   it "shall return 404 on removing nonexistent item", (done) ->
     request 'DELETE', "#{s}/user/22222/", (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 404
+      execenv.res.should.eql []
       done()
 
   it "shall return 200 on removing the created", (done) ->
     request 'DELETE', "#{s}/user/#{created.id}/", (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 200
-      done()
+      execenv.res[0][0].should.eql "tar -czf /tmp/gandalf.tgz /home/gandalf " +
+        "&& rm -rf /home/gandalf"
+      execenv.res[1][0].should.eql "smbpasswd -x gandalf"
+      setTimeout () ->
+        done()
+      , 1800
