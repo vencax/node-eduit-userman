@@ -11,16 +11,17 @@ module.exports = (s, request, execenv) ->
       last_name: 'the gray'
       email: 'g@nda.lf'
       password: 'secretwhisper'
+      gid_id: 2
 
   it "must not login without username", (done) ->
-    request.post "#{s}/user/", {form: _getObj()}, (err, res, body) ->
+    request "POST", "#{s}/user/", _getObj(), (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 201
 
       withoutname = _getObj()
       delete withoutname['username']
 
-      request.post "#{s}/login/", {form: withoutname}, (err, res) ->
+      request "POST", "#{s}/login/", withoutname, (err, res) ->
         return done err if err
         res.statusCode.should.eql 401
         done()
@@ -29,7 +30,7 @@ module.exports = (s, request, execenv) ->
     without = _getObj()
     delete without['password']
 
-    request.post "#{s}/login/", {form: without}, (err, res) ->
+    request "POST", "#{s}/login/", without, (err, res) ->
       return done err if err
       res.statusCode.should.eql 401
       done()
@@ -38,7 +39,7 @@ module.exports = (s, request, execenv) ->
     o = _getObj()
     o.username = 'NOTexists'
 
-    request.post "#{s}/login/", {form: o}, (err, res) ->
+    request "POST", "#{s}/login/", o, (err, res) ->
       return done err if err
       res.statusCode.should.eql 401
       done()
@@ -47,7 +48,7 @@ module.exports = (s, request, execenv) ->
     o = _getObj()
     o.username = 'NOTexists'
 
-    request.post "#{s}/login/", {form: o}, (err, res) ->
+    request "POST", "#{s}/login/", o, (err, res) ->
       return done err if err
       res.statusCode.should.eql 401
       done()
@@ -55,7 +56,7 @@ module.exports = (s, request, execenv) ->
   it "must login with right credentials", (done) ->
     o = _getObj()
 
-    request.post "#{s}/login/", {form: o}, (err, res, body) ->
+    request "POST", "#{s}/login/", o, (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 200
       body = JSON.parse(body)

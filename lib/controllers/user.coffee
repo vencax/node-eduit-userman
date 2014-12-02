@@ -3,21 +3,26 @@ pwdutils = require('../pwdutils')
 
 module.exports = (db) ->
 
+  userHooks = require('./hooks')(db)  # user hooks
+
   index: (req, res) ->
     db.User.findAll().on 'success', (found) ->
       res.json found
 
 
   create: (req, res, next) ->
-    if not req.body.username or not req.body.password
-      return res.status(400).send("missing required param: name, mac, ip")
+    if not req.body.username or not req.body.password or not req.body.gid_id
+      return res.status(400).send("REQUIRED_PARAM_MISSING")
+    req.body.rawpwd = req.body.password
     req.body.password = pwdutils.create_django_hash(req.body.password)
     db.User.create(req.body).then (created) ->
       created.password = null
       res.status(201).send created
+      userHooks.afterCreate(req.body)
     .catch (err) ->
+      if err.name == 'SequelizeUniqueConstraintError'
+        return res.status(400).send('ALREADY_EXISTS')
       res.status(400).send err
-
 
   show: (req, res) ->
     req.user.password = null
@@ -26,13 +31,18 @@ module.exports = (db) ->
 
 
   update: (req, res) ->
+    if req.body.password
+      req.user.rawpwd = req.body.password if req.body.password
+      req.body.password = pwdutils.create_django_hash(req.body.password)
     req.user.updateAttributes(req.body).then () ->
       res.json req.user
+      userHooks.afterUpdate(req.user)
 
 
   destroy: (req, res) ->
     req.user.destroy().then () ->
       res.json req.user
+      userHooks.afterDestroy(req.user)
 
 
   # actual object loading function (loads based on req url params)

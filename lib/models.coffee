@@ -57,3 +57,26 @@ module.exports = (sequelize, DataTypes) ->
     user: DataTypes.STRING
     hash_method: DataTypes.STRING
     unixpwd: DataTypes.STRING
+
+
+  SysGroup: sequelize.define "SysGroup",
+    group_id:
+      type: DataTypes.INTEGER
+      allowNull: false
+      autoIncrement: true
+      primaryKey: true
+    group_name:
+      type: DataTypes.STRING
+      allowNull: false
+      unique: true
+    status: DataTypes.STRING
+  ,
+    tableName: "groups"
+    timestamps: false
+
+  SysMembership: sequelize.define "SysMembership",
+    user: DataTypes.INTEGER
+    group: DataTypes.INTEGER
+  ,
+    tableName: "user_group"
+    timestamps: false

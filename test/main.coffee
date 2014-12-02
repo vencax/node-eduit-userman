@@ -22,8 +22,30 @@ child_process_moc.hijack 'exec', (prog, pars, cb) ->
   rpars = if cb then pars else {}
   cb ?= pars
   execenv.res.push([prog, rpars])
-  if cb
-    cb(execenv.err || null, execenv.stdout || null, execenv.stderr || null)
+  setTimeout(() ->
+    if cb
+      cb(execenv.err || null, execenv.stdout || null, execenv.stderr || null)
+  , 100)
+  ret =
+    stdout: process.stdout
+    stderr: process.stderr
+
+_makeReq = (method, url, body, cb) ->
+  if method in ["GET", "DELETE"]
+    return request {url: url, method: method}, body
+
+  sBody = JSON.stringify(body)
+  headers =
+    'Content-Type': 'application/json',
+    'Content-Length': sBody.length
+  options =
+    url: url
+    method: method,
+    headers: headers
+  req = request options, cb
+  req.write sBody
+  req.end
+
 
 # entry ...
 describe "app", ->
@@ -75,5 +97,6 @@ describe "app", ->
   # run the rest of tests
   baseurl = "http://localhost:#{port}"
 
-  require('./crud')(baseurl, request, execenv)
-  require('./login')(baseurl, request, execenv)
+  require('./group')(baseurl, _makeReq, execenv)
+  require('./crud')(baseurl, _makeReq, execenv)
+  require('./login')(baseurl, _makeReq, execenv)

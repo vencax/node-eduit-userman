@@ -11,14 +11,25 @@ module.exports = (s, request, execenv) ->
       last_name: 'the gray'
       email: 'g@nda.lf'
       password: 'secretwhisper'
+      gid_id: 2
+      groups: [3, 4]
 
   created = undefined
+
+  it "must create all this groups for further tests", (done) ->
+    for i in [0..3]
+      request 'POST', "#{s}/group/", {name: "group #{i}"}, (err, res) ->
+        return done err if err
+        res.statusCode.should.eql 201
+    setTimeout () ->
+      done()
+    , 400
 
   it "must not create if requred param (username) is missing", (done) ->
     withoutname = _getObj()
     delete withoutname['username']
 
-    request.post "#{s}/user/", {form: withoutname}, (err, res) ->
+    request 'POST', "#{s}/user/", withoutname, (err, res) ->
       return done err if err
       res.statusCode.should.eql 400
       done()
@@ -27,15 +38,15 @@ module.exports = (s, request, execenv) ->
     without = _getObj()
     delete without['password']
 
-    request.post "#{s}/user/", {form: without}, (err, res) ->
+    request 'POST', "#{s}/user/", without, (err, res) ->
       return done err if err
       res.statusCode.should.eql 400
       done()
 
-  it "should create new item on right POST request", (done) ->
+  it "should create new user on right POST request", (done) ->
     o = _getObj()
-    
-    request.post "#{s}/user/", {form: o}, (err, res, body) ->
+
+    request 'POST', "#{s}/user/", o, (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 201
       res.should.be.json
@@ -44,18 +55,20 @@ module.exports = (s, request, execenv) ->
       should.not.exist body.password
       body.username.should.eql o.username
       body.email.should.eql o.email
-      done()
+      setTimeout () ->
+        done()
+      , 400
 
   it "must not create if already exists in DB", (done) ->
     h = _getObj()
 
-    request.post "#{s}/user/", {form: h}, (err, res) ->
+    request 'POST', "#{s}/user/", h, (err, res) ->
       return done err if err
       res.statusCode.should.eql 400
       done()
 
   it "shall return the loaded list", (done) ->
-    request "#{s}/user/", (err, res, body) ->
+    request 'GET', "#{s}/user/", (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 200
       body = JSON.parse(body)
@@ -64,14 +77,14 @@ module.exports = (s, request, execenv) ->
       done()
 
   it "shall return 404 on get nonexistent", (done) ->
-    request "#{s}/user/22222", (err, res, body) ->
+    request 'GET', "#{s}/user/22222", (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 404
       done()
 
 
   it "shall return object with given ID", (done) ->
-    request "#{s}/user/#{created.id}/", (err, res, body) ->
+    request 'GET', "#{s}/user/#{created.id}/", (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 200
       body = JSON.parse(body)
@@ -81,31 +94,34 @@ module.exports = (s, request, execenv) ->
       body.email.should.eql created.email
       done()
 
+
   changed =
     last_name: "The white!!"
 
   it "shall update item with given ID with desired values", (done) ->
-    request.put "#{s}/user/#{created.id}/", {form: changed}, (err, res, body) ->
+    request 'PUT', "#{s}/user/#{created.id}/", changed, (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 200
       body = JSON.parse(body)
       body.last_name.should.eql changed.last_name
-      done()
+      setTimeout () ->
+        done()
+      , 400
 
   it "shall return 404 on updating nonexistent item", (done) ->
-    request.put "#{s}/user/22222/", {form: changed}, (err, res, body) ->
+    request 'PUT', "#{s}/user/22222/", changed, (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 404
       done()
 
   it "shall return 404 on removing nonexistent item", (done) ->
-    request.del "#{s}/user/22222/", {form: changed}, (err, res, body) ->
+    request 'DELETE', "#{s}/user/22222/", (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 404
       done()
 
   it "shall return 200 on removing the created", (done) ->
-    request.del "#{s}/user/#{created.id}/", (err, res, body) ->
+    request 'DELETE', "#{s}/user/#{created.id}/", (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 200
       done()
