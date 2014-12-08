@@ -7,8 +7,10 @@ var cors = require('cors');
 
 var port = process.env.PORT || 8080;
 
+var sendMail = {};
+
 var modelModules = [
-  require('./models')
+  require('./lib/models')
 ];
 
 require('./lib/db').init(modelModules, function(err, sequelize) {
@@ -22,7 +24,7 @@ require('./lib/db').init(modelModules, function(err, sequelize) {
 
   require('./lib/app')(api, sequelize, sendMail);
 
-  app.listen(port, function() {
+  api.listen(port, function() {
     console.log('gandalf do magic on ' + port);
   });
 
