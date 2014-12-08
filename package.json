@@ -8,17 +8,18 @@
   },
   "dependencies": {
     "bcrypt": "^0.8.0",
+    "body-parser": "^1.8.2",
     "coffee-script": "^1.8.0",
     "cors": "^2.5.2",
     "express": "^4.9.0",
     "express-jwt": "^0.5.1",
     "express-resource": "^1.0.0",
     "jsonwebtoken": "^1.1.2",
+    "mysql": "^2.5.3",
     "pbkdf2-sha256": "^1.0.1",
     "sequelize": "^2.0.0-rc2"
   },
   "devDependencies": {
-    "body-parser": "^1.8.2",
     "grunt": "~0.4.1",
     "grunt-cli": "*",
     "grunt-coffeelint": "0.0.8",
