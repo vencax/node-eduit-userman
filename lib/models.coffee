@@ -57,6 +57,9 @@ module.exports = (sequelize, DataTypes) ->
     user: DataTypes.STRING
     hash_method: DataTypes.STRING
     unixpwd: DataTypes.STRING
+  ,
+    tableName: "user"
+    timestamps: false
 
 
   SysGroup: sequelize.define "SysGroup",
