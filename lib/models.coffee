@@ -20,6 +20,9 @@ module.exports = (sequelize, DataTypes) ->
     is_superuser:
       type: DataTypes.INTEGER
       default: 0
+    gid:
+      type: DataTypes.INTEGER
+      allowNull: false
     last_login: DataTypes.DATE
     date_joined: DataTypes.DATE
   ,
@@ -34,6 +37,14 @@ module.exports = (sequelize, DataTypes) ->
       unique: true
   ,
     tableName: "auth_group"
+    timestamps: false
+
+
+  UserGroup: sequelize.define "UserGroup",
+    user_id: DataTypes.INTEGER
+    group_id: DataTypes.INTEGER
+  ,
+    tablename: "auth_user_groups"
     timestamps: false
 
 

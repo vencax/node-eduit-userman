@@ -98,6 +98,8 @@ describe "app", ->
   baseurl = "http://localhost:#{port}"
 
   require('./group')(baseurl, _makeReq, execenv)
+  require('./prereqs')(baseurl, _makeReq, execenv)
   require('./crud')(baseurl, _makeReq, execenv)
   require('./login')(baseurl, _makeReq, execenv)
   require('./changepasswd')(baseurl, _makeReq, execenv)
+  require('./grouphandling')(baseurl, _makeReq, execenv)

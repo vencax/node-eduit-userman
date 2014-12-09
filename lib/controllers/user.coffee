@@ -5,18 +5,34 @@ module.exports = (db) ->
 
   userHooks = require('./hooks')(db)  # user hooks
 
+  syncGroups = (user, groups) ->
+    # delete all memberships
+    db.UserGroup.destroy({where: {user_id: user.id}})
+    .then (affectedRows) ->
+      # create them all
+      mships = ({user_id: user.id, group_id: g} for g in groups)
+      db.UserGroup.bulkCreate(mships)
+
   index: (req, res) ->
-    db.User.findAll().then (found) ->
+    db.User.findAll()
+      # include: [{ model: db.UserGroup, as: 'groups' }]
+    .then (found) ->
       res.json found
 
   create: (req, res, next) ->
-    if not req.body.username or not req.body.password or not req.body.gid_id
+    if not req.body.username or not req.body.password or not req.body.gid
       return res.status(400).send("REQUIRED_PARAM_MISSING")
     req.body.rawpwd = req.body.password
     req.body.password = pwdutils.create_django_hash(req.body.password)
     db.User.create(req.body).then (created) ->
-      created.password = null
-      res.status(201).send(created).end()
+      rv = created.toJSON()
+
+      if req.body.groups and req.body.groups.length > 0
+        syncGroups(created, req.body.groups)
+        rv.groups = req.body.groups
+
+      delete rv.password
+      res.status(201).json(rv)
       userHooks.afterCreate(req.body)
     .catch (err) ->
       if err.name == 'SequelizeUniqueConstraintError'
@@ -27,16 +43,35 @@ module.exports = (db) ->
 
   show: (req, res) ->
     req.user.password = null
-    # return already found (loaded) host
-    res.send(req.user).end()
+    rv = req.user.toJSON()
+    db.UserGroup.findAll
+      where: {user_id: req.user.id}
+      attributes: ['group_id']
+    .then (groups) ->
+      rv.groups = (v.group_id for k, v of groups)
+      # return already found (loaded) host
+      res.json(rv)
 
 
   update: (req, res) ->
     if req.body.password
       req.user.rawpwd = req.body.password if req.body.password
       req.body.password = pwdutils.create_django_hash(req.body.password)
+    else
+      delete req.body.password
     req.user.updateAttributes(req.body).then () ->
-      res.json req.user
+      rv = req.user.toJSON()
+      if req.body.groups and req.body.groups.length > 0
+        syncGroups(req.user, req.body.groups)
+        rv.groups = req.body.groups
+        res.json(rv)
+      else
+        db.UserGroup.findAll
+          where: {user_id: req.user.id}
+          attributes: ['group_id']
+        .then (groups) ->
+          rv.groups = (v.group_id for k, v of groups)
+          res.json(rv)
       userHooks.afterUpdate(req.user)
 
 

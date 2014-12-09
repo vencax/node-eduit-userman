@@ -18,19 +18,10 @@ module.exports = (s, request, execenv) ->
       last_name: 'the gray'
       email: 'g@nda.lf'
       password: 'secretwhisper'
-      gid_id: 2
+      gid: 2
       groups: [3, 4]
 
   created = undefined
-
-  it "must create all this groups for further tests", (done) ->
-    for i in [0..3]
-      request 'POST', "#{s}/group/", {name: "group #{i}"}, (err, res) ->
-        return done err if err
-        res.statusCode.should.eql 201
-    setTimeout () ->
-      done()
-    , 400
 
   it "must not create if requred param (username) is missing", (done) ->
     withoutname = _getObj()

@@ -11,7 +11,7 @@ module.exports = (s, request, execenv) ->
       last_name: 'the gray'
       email: 'g@nda.lf'
       password: 'secretwhisper'
-      gid_id: 2
+      gid: 2
 
   it "must not login without username", (done) ->
     request "POST", "#{s}/user/", _getObj(), (err, res, body) ->

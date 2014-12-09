@@ -37,7 +37,7 @@ module.exports = (db) ->
     sysUser.realname = "#{user.first_name} #{user.last_name}"
     sysUser.status = 'A'
 
-    _getOrCreateSysGroup user.gid_id, (err, sysGID) ->
+    _getOrCreateSysGroup user.gid, (err, sysGID) ->
       sysUser.gid_id = sysGID.group_id
       sysUser.save().then (saved) ->
         _syncGroups(user.groups, sysUser)
@@ -131,8 +131,8 @@ module.exports = (db) ->
 
   afterUpdate: (user) ->
     db.SysUser.find({where: {user_name: user.username}}).then (sysuser) ->
-      if not user.gid_id
-        user.gid_id = sysuser.gid_id
+      if not user.gid
+        user.gid = sysuser.gid_id
       _syncSysUser(user, sysuser)
 
       if user.rawpwd and ISSUE_SAMBA_COMMANDS

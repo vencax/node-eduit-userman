@@ -9,7 +9,7 @@ module.exports = (s, request, execenv) ->
       username: 'gimly'
       email: 'gimly@nda.lf'
       password: 'secretwhisper'
-      gid_id: 2
+      gid: 2
       groups: [3, 4]
 
   created = null
@@ -32,6 +32,8 @@ module.exports = (s, request, execenv) ->
       , 800
 
   it "shall update gimly's password", (done) ->
+    this.timeout(0)
+
     changed =
       password: "topsecret"
 
@@ -53,4 +55,4 @@ module.exports = (s, request, execenv) ->
           body.username.should.eql 'gimly'
           should.exist body.token
           done()
-      , 400
+      , 4000
