@@ -72,7 +72,7 @@ describe "app", ->
     for k, mdl of mdls
       db[k] = mdl
 
-    db.sequelize.sync().on 'success', () ->
+    db.sequelize.sync().then () ->
 
       apiMod app, db
 

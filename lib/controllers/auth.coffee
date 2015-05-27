@@ -13,8 +13,7 @@ module.exports = (db) ->
     return _sendError(res)  unless req.body.password
 
     # We are sending the profile inside the token
-    db.User.find({where: {username: req.body.username}})
-    .on "success", (found) ->
+    db.User.find({where: {username: req.body.username}}).then (found) ->
       return _sendError(res)  unless found
 
       if not pwdutils.django_pwd_match(req.body.password, found.password)
@@ -28,12 +27,11 @@ module.exports = (db) ->
 
       res.json profile
 
-    .on "error", (err) ->
+    .catch (err) ->
       res.send 401, err
 
   check: (req, res) ->
-    db.User.find({where: {username: req.body.username}})
-    .on "success", (found) ->
+    db.User.find({where: {username: req.body.username}}).then (found) ->
       res.json [1]
-    .on "error", () ->
+    .catch () ->
       res.json []
