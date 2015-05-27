@@ -13,7 +13,9 @@ port = process.env.PORT || 3333
 process.env.SERVER_SECRET='jfdlksjflaf'
 process.env.PWD_SALT='p9Tkr6uqxKtf'
 process.env.DONT_PROTECT=true
-process.env.DATABASE_URL='mysql://pgina:heslo77@localhost:5000/pgina'
+process.env.LOGONSERVER='mordor'
+# process.env.DATABASE_URL='mysql://pgina:heslo77@localhost:5000/pgina'
+# process.env.DATABASE_URL='sqlite://db.sqlite'
 
 execenv =
   res: []
@@ -52,29 +54,23 @@ _makeReq = (method, url, body, cb) ->
 describe "app", ->
 
   apiMod = require(__dirname + '/../lib/app')
+  dbM = require(__dirname + '/../lib/db')
   g = {}
-  Sequelize = require('sequelize')
-  db = {}
+
+  modelModules = [
+    require(__dirname + '/../lib/models')
+  ]
 
   before (done) ->
-    # init server
-    app = express()
-    app.use(bodyParser.urlencoded({ extended: false }))
-    app.use(bodyParser.json())
 
-    db.sequelize = new Sequelize('database', 'username', 'password',
-      # sqlite! now!
-      dialect: 'sqlite'
-    )
+    dbM.init modelModules, (err, sequelize) ->
 
-    # register models
-    mdls = require(__dirname + '/../lib/models')(db.sequelize, Sequelize)
-    for k, mdl of mdls
-      db[k] = mdl
+      # init server
+      app = express()
+      app.use(bodyParser.urlencoded({ extended: false }))
+      app.use(bodyParser.json())
 
-    db.sequelize.sync().then () ->
-
-      apiMod app, db
+      apiMod(app, sequelize)  # inject api routes
 
       app.use (req, res, next) ->
         req.user =

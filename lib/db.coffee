@@ -1,15 +1,18 @@
 
 Sequelize = require("sequelize")
 
-dburl = process.env.DATABASE_URL or "sqlite://"
-opts = {}
+if process.env.DATABASE_URL
+  opts = {}
+  # opts.logging = false  unless process.env.NODE_ENV is "devel"
+  if dburl.indexOf("sqlite://") >= 0
+    opts.storage = "db.sqlite"
 
-# opts.logging = false  unless process.env.NODE_ENV is "devel"
-if dburl.indexOf("sqlite://") >= 0
-  opts.storage = "db.sqlite"
-
-sequelize = new Sequelize(dburl, opts)
-
+  sequelize = new Sequelize(dburl, opts)
+else
+  # in MEMORY sqlite
+  sequelize = new Sequelize('database', 'username', 'password',
+    dialect: 'sqlite'
+  )
 
 module.exports.init = (modelModules, cb) ->
 
@@ -21,12 +24,13 @@ module.exports.init = (modelModules, cb) ->
 
   db.User.hasMany(db.UserGroup)
 
-  return cb null, db unless process.env.NODE_ENV is "devel"
+  db.sequelize.sync().then () ->
+    return cb(null, db)
 
-  migrator = sequelize.getMigrator
-    path:        __dirname + '/migrations'
-    filesFilter: /\.coffee$/
-  migrator.migrate({ method: 'up' }).then () ->
-    cb(null, db)
-  .catch (err) ->
-    cb('Unable to sync database: ' + err)
+  # migrator = sequelize.getMigrator
+  #   path:        __dirname + '/migrations'
+  #   filesFilter: /\.coffee$/
+  # migrator.migrate({ method: 'up' }).then () ->
+  #   cb(null, db)
+  # .catch (err) ->
+  #   cb('Unable to sync database: ' + err)
