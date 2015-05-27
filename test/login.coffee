@@ -12,6 +12,7 @@ module.exports = (s, request, execenv) ->
       email: 'g@nda.lf'
       password: 'secretwhisper'
       gid: 2
+      groups: [3, 4]
 
   it "must not login without username", (done) ->
     request "POST", "#{s}/user/", _getObj(), (err, res, body) ->
@@ -84,4 +85,16 @@ module.exports = (s, request, execenv) ->
       res.statusCode.should.eql 200
       body = JSON.parse(body)
       body.should.eql [1]
+      done()
+
+  it "must return logon script according group m-ship", (done) ->
+    o = _getObj()
+
+    request "GET", "#{s}/logonscript/#{o.username}", (err, res, body) ->
+      return done err if err
+      res.statusCode.should.eql 200
+      console.log body
+      body.indexOf("group 0").should.be.above 0
+      body.indexOf("group 1").should.be.above 0
+      body.indexOf("group 2").should.be.above 0
       done()
