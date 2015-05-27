@@ -2,6 +2,7 @@
 path = require('path')
 fs = require('fs')
 crypto = require('crypto')
+bcrypt = require('bcrypt')
 exec = require('child_process').exec
 
 
@@ -14,7 +15,6 @@ PGINA_HACKS = process.env.PGINA_HACKS || true
 module.exports = (db) ->
 
   _getUnixPwd = (rawPwd) ->
-    bcrypt = require('bcrypt')
     salt = bcrypt.genSaltSync(10)
     return bcrypt.hashSync(rawPwd, salt)
 
@@ -131,6 +131,10 @@ module.exports = (db) ->
 
   afterUpdate: (user) ->
     db.SysUser.find({where: {user_name: user.username}}).then (sysuser) ->
+      if not sysuser
+        console.log "WEIRD: sysuser #{user.username} not found!"
+        return
+
       if not user.gid
         user.gid = sysuser.gid_id
       _syncSysUser(user, sysuser)
@@ -143,7 +147,8 @@ module.exports = (db) ->
         # change realname of da samba user
         # see: http://www.samba.org/samba/docs/man/manpages/pdbedit.8.html
         modFullname = "pdbedit --modify -u #{user.username}"
-        modFullname += " --fullname \"#{sysuser.realname}\""
+        if sysuser.realname?
+          modFullname += " --fullname \"#{sysuser.realname}\""
         _run_command(modFullname)
 
     .catch (err) ->
@@ -152,6 +157,10 @@ module.exports = (db) ->
   afterDestroy: (user) ->
     _delSambaUserAndHome(user.username)
     db.SysUser.find({where: {user_name: user.username}}).then (sysuser) ->
+      if not sysuser
+        console.log "WEIRD: sysuser #{user.username} not found!"
+        return
+
       sysuser.destroy()
     .catch (err) ->
       console.log(err.stack)

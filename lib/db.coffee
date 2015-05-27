@@ -19,16 +19,14 @@ module.exports.init = (modelModules, cb) ->
     for modelName, model of mod(sequelize, Sequelize)
       db[modelName] = model
 
-  cb null, db
+  db.User.hasMany(db.UserGroup)
 
-  ###
-  var migrator = sequelize.getMigrator({
-    path:        __dirname + '/migrations',
+  return cb null, db unless process.env.NODE_ENV is "devel"
+
+  migrator = sequelize.getMigrator
+    path:        __dirname + '/migrations'
     filesFilter: /\.coffee$/
-  });
-  migrator.migrate({ method: 'up' }).then(function() {
-    cb(null, db);
-  }).catch(function(err) {
-    cb('Unable to sync database: ' + err);
-  });
-  ###
+  migrator.migrate({ method: 'up' }).then () ->
+    cb(null, db)
+  .catch (err) ->
+    cb('Unable to sync database: ' + err)

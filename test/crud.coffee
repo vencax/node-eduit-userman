@@ -50,11 +50,13 @@ module.exports = (s, request, execenv) ->
       res.statusCode.should.eql 201
       res.should.be.json
       body = created = JSON.parse(body)
+      console.log "created user: #{JSON.stringify(created)}"
       should.exist body.id
       should.not.exist body.password
       body.username.should.eql o.username
       body.email.should.eql o.email
       setTimeout () ->
+        console.log "verifying background commands ..."
         execenv.res.length.should.eql 3
         execenv.res[0][0].should.eql "mv /home/gandalf /tmp"
         execenv.res[1][0].should.eql "(echo #{o.password};" +

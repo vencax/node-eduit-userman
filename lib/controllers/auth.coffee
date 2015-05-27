@@ -8,7 +8,8 @@ module.exports = (db) ->
   _sendError = (res) ->
     res.status(401).send("WRONG_CREDENTIALS")
 
-  return (req, res) ->
+  # return
+  login: (req, res) ->
     return _sendError(res)  unless req.body.password
 
     # We are sending the profile inside the token
@@ -29,3 +30,10 @@ module.exports = (db) ->
 
     .on "error", (err) ->
       res.send 401, err
+
+  check: (req, res) ->
+    db.User.find({where: {username: req.body.username}})
+    .on "success", (found) ->
+      res.json [1]
+    .on "error", () ->
+      res.json []

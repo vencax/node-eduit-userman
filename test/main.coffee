@@ -13,6 +13,7 @@ port = process.env.PORT || 3333
 process.env.SERVER_SECRET='jfdlksjflaf'
 process.env.PWD_SALT='p9Tkr6uqxKtf'
 process.env.DONT_PROTECT=true
+process.env.DATABASE_URL='mysql://pgina:heslo77@localhost:5000/pgina'
 
 execenv =
   res: []

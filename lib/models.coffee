@@ -41,10 +41,14 @@ module.exports = (sequelize, DataTypes) ->
 
 
   UserGroup: sequelize.define "UserGroup",
-    user_id: DataTypes.INTEGER
+    # Set FK relationship (hasMany) with `User`
+    user_id:
+      type: DataTypes.INTEGER
+      # references: "Users"
+      # referencesKey: "id"
     group_id: DataTypes.INTEGER
   ,
-    tablename: "auth_user_groups"
+    tableName: "auth_user_groups"
     timestamps: false
 
 

@@ -1,18 +1,23 @@
 
 expressJwt = require("express-jwt")
+authM = require("./controllers/auth")
+userM = require("./controllers/user")
+groupM = require("./controllers/group")
 
 
 module.exports = (app, db, sendMail) ->
 
-  app.post "/login", require("./auth")(db)
+  authRoutes = authM(db)
+  app.post "/login", authRoutes.login
+  app.get "/check", authRoutes.check
 
   if not process.env.DONT_PROTECT
     # the rest of API secure with JWT
     app.use expressJwt(secret: process.env.SERVER_SECRET)
 
   # create the routes
-  app.resource "user", require("./controllers/user")(db)
-  app.resource "group", require("./controllers/group")(db)
+  app.resource "user", userM(db)
+  app.resource "group", groupM(db)
 
   # catcher of auth excepts
   app.use (err, req, res, next) ->
