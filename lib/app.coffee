@@ -9,7 +9,7 @@ module.exports = (app, db, sendMail) ->
 
   authRoutes = authM(db)
   app.post "/login", authRoutes.login
-  app.get "/check", authRoutes.check
+  app.post "/check", authRoutes.check
 
   if not process.env.DONT_PROTECT
     # the rest of API secure with JWT

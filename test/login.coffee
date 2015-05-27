@@ -63,3 +63,25 @@ module.exports = (s, request, execenv) ->
       body.username.should.eql o.username
       should.exist body.token
       done()
+
+  # check
+  it "must return no errors on valid user", (done) ->
+    o = _getObj()
+    o.username = 'NOTexists'
+
+    request "POST", "#{s}/check", o, (err, res, body) ->
+      return done err if err
+      res.statusCode.should.eql 200
+      body = JSON.parse(body)
+      body.should.eql []
+      done()
+
+  it "must indicate that username already exists", (done) ->
+    o = _getObj()
+
+    request "POST", "#{s}/check", o, (err, res, body) ->
+      return done err if err
+      res.statusCode.should.eql 200
+      body = JSON.parse(body)
+      body.should.eql [1]
+      done()

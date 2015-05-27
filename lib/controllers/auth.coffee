@@ -32,6 +32,7 @@ module.exports = (db) ->
 
   check: (req, res) ->
     db.User.find({where: {username: req.body.username}}).then (found) ->
+      return res.json [] if not found
       res.json [1]
     .catch () ->
       res.json []
