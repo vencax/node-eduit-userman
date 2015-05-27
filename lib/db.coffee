@@ -4,10 +4,10 @@ Sequelize = require("sequelize")
 if process.env.DATABASE_URL
   opts = {}
   # opts.logging = false  unless process.env.NODE_ENV is "devel"
-  if dburl.indexOf("sqlite://") >= 0
+  if process.env.DATABASE_URL.indexOf("sqlite://") >= 0
     opts.storage = "db.sqlite"
 
-  sequelize = new Sequelize(dburl, opts)
+  sequelize = new Sequelize(process.env.DATABASE_URL, opts)
 else
   # in MEMORY sqlite
   sequelize = new Sequelize('database', 'username', 'password',
