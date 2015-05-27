@@ -39,7 +39,7 @@ module.exports = (s, request, execenv) ->
 
   it "shall update legolas's groups", (done) ->
     changed =
-      gid: 1
+      gid: 3
       groups: [2]
 
     request 'PUT', "#{s}/user/#{created.id}/", changed, (err, res, body) ->
