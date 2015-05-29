@@ -1,6 +1,6 @@
 {
   "name": "eduit-userman",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Eduit user management REST server",
   "main": "server.js",
   "engines": {
