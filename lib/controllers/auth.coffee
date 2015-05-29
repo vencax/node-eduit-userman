@@ -16,7 +16,7 @@ module.exports = (db) ->
     db.User.find({where: {username: req.body.username}}).then (found) ->
       return _sendError(res)  unless found
 
-      if not pwdutils.django_pwd_match(req.body.password, found.password)
+      if not pwdutils.unixPwdMatch(req.body.password, found.password)
         return _sendError(res)
 
       profile = JSON.parse(JSON.stringify(found))

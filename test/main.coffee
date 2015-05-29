@@ -63,7 +63,7 @@ describe "app", ->
 
   before (done) ->
 
-    dbM.init modelModules, (err, sequelize) ->
+    dbM.init(modelModules, (err, sequelize) ->
 
       # init server
       app = express()
@@ -82,6 +82,8 @@ describe "app", ->
         done()
 
       g.app = app
+
+    , true)  # do sync
 
   after (done) ->
     g.server.close()

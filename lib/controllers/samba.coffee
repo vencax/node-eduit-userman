@@ -29,16 +29,10 @@ module.exports = (db) ->
 
       db.Group.find({where: {id: found.gid}}).then (gid) ->
         _writeGroupScript(res, gid.name)
-        _q = """
-        SELECT name FROM `auth_group` WHERE id IN (
-          SELECT group_id FROM `auth_user_groups` WHERE user_id=?
-        )"""
-        db.sequelize.query _q,
-          type: db.sequelize.QueryTypes.SELECT
-          replacements: [found.id]
-        .then (groupnames) ->
-          for r in groupnames
-            _writeGroupScript(res, r.name)
+
+        found.getGroups().then (groups)->
+          for g in groups
+            _writeGroupScript(res, g.name)
           res.end()
     # db.User.find({where: {username: req.params.uname}}).then (found) ->
     #   db.UserGroup.findAll

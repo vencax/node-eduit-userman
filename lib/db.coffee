@@ -14,7 +14,7 @@ else
     dialect: 'sqlite'
   )
 
-module.exports.init = (modelModules, cb) ->
+module.exports.init = (modelModules, cb, doSync) ->
 
   db = {sequelize: sequelize}
 
@@ -22,7 +22,10 @@ module.exports.init = (modelModules, cb) ->
     for modelName, model of mod(sequelize, Sequelize)
       db[modelName] = model
 
-  db.User.hasMany(db.UserGroup)
+  db.User.hasMany db.Group, {through: 'usergroup_mship'}
+  db.Group.hasMany db.User, {through: 'usergroup_mship'}
+
+  return cb(null, db) if not doSync
 
   db.sequelize.sync().then () ->
     return cb(null, db)

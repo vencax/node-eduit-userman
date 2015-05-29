@@ -1,5 +1,7 @@
 
 pbkdf2 = require("pbkdf2-sha256")
+bcrypt = require "bcrypt"
+
 
 throw new Error("SET process.env.PWD_SALT!") unless "PWD_SALT" of process.env
 salt = process.env.PWD_SALT
@@ -17,3 +19,13 @@ exports.django_pwd_match = (key, djpwd) ->
 exports.create_django_hash = (pwd) ->
   hashed = pbkdf2(pwd, new Buffer(salt), iterations, 32).toString("base64")
   algorithm + "$" + iterations + "$" + salt + "$" + hashed
+
+
+getUnixPwd = (rawPwd) ->
+  salt = bcrypt.genSaltSync(10)
+  return bcrypt.hashSync(rawPwd, salt)
+exports.getUnixPwd = getUnixPwd
+
+
+exports.unixPwdMatch = (rawpwd, hash) ->
+  return bcrypt.compareSync(rawpwd, hash)

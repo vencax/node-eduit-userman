@@ -14,8 +14,7 @@ module.exports = (s, request, execenv) ->
   _getObj = ->
     user =
       username: 'gandalf'
-      first_name: 'gandalf'
-      last_name: 'the gray'
+      realname: 'gandalf the gray'
       email: 'g@nda.lf'
       password: 'secretwhisper'
       gid: 2
@@ -55,6 +54,7 @@ module.exports = (s, request, execenv) ->
       should.not.exist body.password
       body.username.should.eql o.username
       body.email.should.eql o.email
+      body.groups.should.eql [3, 4]
       setTimeout () ->
         console.log "verifying background commands ..."
         execenv.res.length.should.eql 3
@@ -103,17 +103,17 @@ module.exports = (s, request, execenv) ->
       done()
 
   changed =
-    last_name: "The white!!"
+    realname: "gandalf the white!!"
 
   it "shall update item with given ID with desired values", (done) ->
     request 'PUT', "#{s}/user/#{created.id}/", changed, (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 200
       body = JSON.parse(body)
-      body.last_name.should.eql changed.last_name
+      body.realname.should.eql changed.realname
       setTimeout () ->
         execenv.res[0][0].should.eql 'pdbedit --modify -u gandalf' +
-          ' --fullname "gandalf The white!!"'
+          ' --fullname "gandalf the white!!"'
         done()
       , 400
 
