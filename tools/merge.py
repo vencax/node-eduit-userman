@@ -49,7 +49,7 @@ def processUser(user, cur):
     if not user['realname']:
         user['realname'] = "%s %s" % (user['first_name'], user['last_name'])
 
-    cur.execute("""INSERT INTO user
+    cur.execute("""INSERT INTO users
     (
         id, username, realname, email, gid, password,
         status, user, hash_method, unixpwd, createdAt, updatedAt
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     """)
     for g in cur.fetchall():
         cur.execute("""
-        INSERT INTO `group` (id, name) VALUES (%s, %s)
+        INSERT INTO groups (id, name) VALUES (%s, %s)
         """, (g['id'], g['name']) )
 
     cur.execute("""SELECT *
@@ -107,11 +107,10 @@ if __name__ == '__main__':
     # upravit sequence
     cur.execute("select max(id)+1 as m from user")
     maxUID = cur.fetchone()['m']
-    cur.execute("ALTER TABLE user AUTO_INCREMENT = %s", (maxUID, ));
+    cur.execute("ALTER TABLE users AUTO_INCREMENT = %s", (maxUID, ));
     cur.execute("select max(id)+1 as m from group")
     maxUID = cur.fetchone()['m']
-    cur.execute("ALTER TABLE `group` AUTO_INCREMENT = %s", (maxUID, ));
+    cur.execute("ALTER TABLE groups AUTO_INCREMENT = %s", (maxUID, ));
 
     conn.commit()
     logging.info("DONE ...")
-

@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) ->
     hash_method: DataTypes.STRING
     unixpwd: DataTypes.STRING
   ,
-    tableName: "user"
+    tableName: "users"
 
 
   Group: sequelize.define "Group",
@@ -31,4 +31,4 @@ module.exports = (sequelize, DataTypes) ->
       unique: true
     status: DataTypes.STRING
   ,
-    tableName: "group"
+    tableName: "groups"
