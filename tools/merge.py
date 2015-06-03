@@ -108,7 +108,7 @@ if __name__ == '__main__':
     cur.execute("select max(id)+1 as m from user")
     maxUID = cur.fetchone()['m']
     cur.execute("ALTER TABLE users AUTO_INCREMENT = %s", (maxUID, ));
-    cur.execute("select max(id)+1 as m from group")
+    cur.execute("select max(id)+1 as m from groups")
     maxUID = cur.fetchone()['m']
     cur.execute("ALTER TABLE groups AUTO_INCREMENT = %s", (maxUID, ));
 
