@@ -105,7 +105,7 @@ if __name__ == '__main__':
             logging.exception(e)
 
     # upravit sequence
-    cur.execute("select max(id)+1 as m from user")
+    cur.execute("select max(id)+1 as m from users")
     maxUID = cur.fetchone()['m']
     cur.execute("ALTER TABLE users AUTO_INCREMENT = %s", (maxUID, ));
     cur.execute("select max(id)+1 as m from groups")
