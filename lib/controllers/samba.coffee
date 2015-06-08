@@ -10,7 +10,7 @@ module.exports = (db) ->
     rem wait 3 secs
     ping 1.1.1.0 -w 1 -n 2 > NUL
 
-    net use H: \\#{process.env.LOGONSERVER}\\%USERNAME%
+    net use H: \\\\#{process.env.LOGONSERVER}\\%USERNAME%
 
     """
 
