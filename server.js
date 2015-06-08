@@ -21,18 +21,16 @@ require('./lib/db').init(modelModules, function(err, sequelize) {
   var api = express();
   // enable CORS
   api.use(cors({maxAge: 86400}));
+  // secure API
+  var unprotected = [
+    '/login', '/check', /\/logonscript\/.*$/
+  ];
+  // the rest of API secure with JWT
+  api.use(
+    expressJwt({secret: process.env.SERVER_SECRET}).unless({path: unprotected})
+  );
+  // enable JSON bodies
   api.use(bodyParser.json());
-
-  if(! process.env.DONT_PROTECT) {
-    var unprotected = [
-      '/login', '/check', '/logonscript/:uname'
-    ]
-    // the rest of API secure with JWT
-
-    app.use(
-      expressJwt(secret: process.env.SERVER_SECRET).unless({path: unprotected})
-    );
-  }
 
   require('./lib/app')(api, sequelize, sendMail);
 
