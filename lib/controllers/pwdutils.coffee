@@ -1,6 +1,7 @@
 
 pbkdf2 = require("pbkdf2-sha256")
 bcrypt = require "bcrypt"
+crypto = require('crypto')
 exec = require('child_process').exec
 
 
@@ -8,6 +9,10 @@ throw new Error("SET process.env.PWD_SALT!") unless "PWD_SALT" of process.env
 salt = process.env.PWD_SALT
 algorithm = "pbkdf2_sha256"
 iterations = 10000
+
+
+exports.createMD5Hash = (pwd) ->
+  return crypto.createHash('md5').update(pwd).digest('hex')
 
 
 exports.django_pwd_match = (key, djpwd) ->
