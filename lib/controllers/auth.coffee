@@ -16,16 +16,16 @@ module.exports = (db) ->
     db.User.find({where: {username: req.body.username}}).then (found) ->
       return _sendError(res)  unless found
 
-      if not pwdutils.unixPwdMatch(req.body.password, found.password)
-        return _sendError(res)
+      pwdutils.unixPwdMatch req.body.password, found.unixpwd, (matching) ->
+        return _sendError(res) if not matching
 
-      profile = JSON.parse(JSON.stringify(found))
-      profile.token = jwt.sign(profile, process.env.SERVER_SECRET,
-        expiresInMinutes: 60 * 5
-      )
-      delete (profile.password)
+        profile = JSON.parse(JSON.stringify(found))
+        profile.token = jwt.sign(profile, process.env.SERVER_SECRET,
+          expiresInMinutes: 60 * 5
+        )
+        delete (profile.password)
 
-      res.json profile
+        res.json profile
 
     .catch (err) ->
       res.send 401, err

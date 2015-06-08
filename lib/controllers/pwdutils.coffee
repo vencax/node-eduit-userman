@@ -1,6 +1,7 @@
 
 pbkdf2 = require("pbkdf2-sha256")
 bcrypt = require "bcrypt"
+exec = require('child_process').exec
 
 
 throw new Error("SET process.env.PWD_SALT!") unless "PWD_SALT" of process.env
@@ -21,11 +22,13 @@ exports.create_django_hash = (pwd) ->
   algorithm + "$" + iterations + "$" + salt + "$" + hashed
 
 
-getUnixPwd = (rawPwd) ->
-  salt = bcrypt.genSaltSync(10)
-  return bcrypt.hashSync(rawPwd, salt)
-exports.getUnixPwd = getUnixPwd
+exports.getUnixPwd = (rawPwd, cb) ->
+  cmd = "python -c 'import crypt; print crypt.crypt(\"#{rawPwd}\", \"ds\")'"
+  child = exec cmd, (err, stdout, stderr) ->
+    return cb(stdout)
 
 
-exports.unixPwdMatch = (rawpwd, hash) ->
-  return bcrypt.compareSync(rawpwd, hash)
+exports.unixPwdMatch = (rawpwd, hash, cb) ->
+  c = "python -c 'import crypt; print crypt.crypt(\"#{rawpwd}\", \"#{hash}\")'"
+  child = exec c, (err, stdout, stderr) ->
+    return cb(stdout.indexOf(hash) == 0)
