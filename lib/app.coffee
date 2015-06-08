@@ -1,5 +1,4 @@
 
-expressJwt = require("express-jwt")
 authM = require("./controllers/auth")
 userM = require("./controllers/user")
 groupM = require("./controllers/group")
@@ -13,10 +12,6 @@ module.exports = (app, db, sendMail) ->
   app.post "/check", authRoutes.check
   sambaRoutes = sambaM(db)
   app.get "/logonscript/:uname", sambaRoutes.logonScript
-
-  if not process.env.DONT_PROTECT
-    # the rest of API secure with JWT
-    app.use expressJwt(secret: process.env.SERVER_SECRET)
 
   # create the routes
   app.resource "user", userM(db)
