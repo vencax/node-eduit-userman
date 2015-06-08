@@ -17,6 +17,7 @@ module.exports = (s, request, execenv) ->
   it "should create new user gimly", (done) ->
     o = _getObj()
     this.timeout(0)
+    execenv.stdout = o.password
 
     request 'POST', "#{s}/user/", o, (err, res, body) ->
       return done err if err
@@ -36,12 +37,13 @@ module.exports = (s, request, execenv) ->
 
     changed =
       password: "topsecret"
+    execenv.stdout = changed.password
 
     request 'PUT', "#{s}/user/#{created.id}/", changed, (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 200
       setTimeout () ->
-        execenv.res[0][0].should.eql "(echo #{changed.password};" +
+        execenv.res[1][0].should.eql "(echo #{changed.password};" +
           " echo #{changed.password}) | smbpasswd -s gimly"
 
         # lets try to login with da new pwd ...

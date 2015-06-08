@@ -6,7 +6,7 @@ module.exports = (s, request, execenv) ->
 
   _getObj = ->
     user =
-      username: 'gandalf'
+      username: 'gandalf2'
       first_name: 'gandalf'
       last_name: 'the gray'
       email: 'g@nda.lf'
@@ -15,7 +15,9 @@ module.exports = (s, request, execenv) ->
       groups: [3, 4]
 
   it "must not login without username", (done) ->
-    request "POST", "#{s}/user/", _getObj(), (err, res, body) ->
+    o = _getObj()
+    execenv.stdout = o.password
+    request "POST", "#{s}/user/", o, (err, res, body) ->
       return done err if err
       res.statusCode.should.eql 201
 
@@ -39,6 +41,7 @@ module.exports = (s, request, execenv) ->
   it "must not login with wrong username", (done) ->
     o = _getObj()
     o.username = 'NOTexists'
+    execenv.stdout = 'TotalyDifferentHash'
 
     request "POST", "#{s}/login/", o, (err, res) ->
       return done err if err
@@ -47,7 +50,7 @@ module.exports = (s, request, execenv) ->
 
   it "must not login with wrong password", (done) ->
     o = _getObj()
-    o.username = 'NOTexists'
+    o.password = 'NOTexists'
 
     request "POST", "#{s}/login/", o, (err, res) ->
       return done err if err
@@ -56,6 +59,7 @@ module.exports = (s, request, execenv) ->
 
   it "must login with right credentials", (done) ->
     o = _getObj()
+    execenv.stdout = o.password
 
     request "POST", "#{s}/login/", o, (err, res, body) ->
       return done err if err

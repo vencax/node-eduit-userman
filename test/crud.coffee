@@ -57,11 +57,10 @@ module.exports = (s, request, execenv) ->
       body.groups.should.eql [3, 4]
       setTimeout () ->
         console.log "verifying background commands ..."
-        execenv.res.length.should.eql 3
-        execenv.res[0][0].should.eql "mv /home/gandalf /tmp"
-        execenv.res[1][0].should.eql "(echo #{o.password};" +
+        execenv.res[1][0].should.eql "mv /home/gandalf /tmp"
+        execenv.res[2][0].should.eql "(echo #{o.password};" +
           " echo #{o.password}) | smbpasswd -s -a #{o.username}"
-        execenv.res[2][0].should.eql "cp -R /etc/skel /home/gandalf" +
+        execenv.res[3][0].should.eql "cp -R /etc/skel /home/gandalf" +
           " && chown -R gandalf:adm /home/gandalf && chmod 770 /home/gandalf"
         done()
       , 800
@@ -72,7 +71,7 @@ module.exports = (s, request, execenv) ->
     request 'POST', "#{s}/user/", h, (err, res) ->
       return done err if err
       res.statusCode.should.eql 400
-      execenv.res.should.eql []
+      execenv.res[0][0].indexOf('python').should.eql 0  # password gen
       done()
 
   it "shall return the loaded list", (done) ->

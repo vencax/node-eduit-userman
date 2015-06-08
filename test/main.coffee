@@ -25,10 +25,12 @@ child_process_moc.hijack 'exec', (prog, pars, cb) ->
   rpars = if cb then pars else {}
   cb ?= pars
   execenv.res.push([prog, rpars])
-  setTimeout(() ->
-    if cb
-      cb(execenv.err || null, execenv.stdout || null, execenv.stderr || null)
-  , 50)
+  err = execenv.err || null
+  stdout = execenv.stdout || null
+  stderr = execenv.stderr || null
+  setTimeout () ->
+    cb(err, stdout, stderr) if cb
+  , 10
   ret =
     stdout: {pipe: (r) ->}
     stderr: {pipe: (r) ->}

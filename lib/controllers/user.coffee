@@ -18,20 +18,22 @@ module.exports = (db) ->
     if not req.body.username or not req.body.password or not req.body.gid
       return res.status(400).send("REQUIRED_PARAM_MISSING")
     rawpwd = req.body.password
-    req.body.password = pwdutils.getUnixPwd(req.body.password)
-    db.User.create(req.body).then (created) ->
-      rv = created.toJSON()
-      _syncGroups created, req.body.groups, (err, groups)->
-        rv.groups = groups
-        delete rv.password
-        res.status(201).json(rv)
-        rv.rawpwd = rawpwd
-        userHooks.afterCreate(rv)
+    pwdutils.getUnixPwd req.body.password, (unixPwd) ->
+      req.body.password = pwdutils.createMD5Hash(req.body.password)
+      req.body.unixpwd = unixPwd
+      db.User.create(req.body).then (created) ->
+        rv = created.toJSON()
+        _syncGroups created, req.body.groups, (err, groups)->
+          rv.groups = groups
+          delete rv.password
+          res.status(201).json(rv)
+          rv.rawpwd = rawpwd
+          userHooks.afterCreate(rv)
 
-    .catch (err) ->
-      if err.name == 'SequelizeUniqueConstraintError'
-        return res.status(400).send('ALREADY_EXISTS')
-      res.status(400).send err
+      .catch (err) ->
+        if err.name == 'SequelizeUniqueConstraintError'
+          return res.status(400).send('ALREADY_EXISTS')
+        res.status(400).send err
 
 
   show: (req, res) ->
@@ -45,24 +47,29 @@ module.exports = (db) ->
 
 
   update: (req, res) ->
+    _save = () ->
+      req.user.updateAttributes(req.body).then () ->
+        rv = req.user.toJSON()
+        if req.body.groups and req.body.groups.length > 0
+          _syncGroups req.user, req.body.groups, (err, groups)->
+            rv.groups = groups
+            res.json(rv)
+            userHooks.afterUpdate(req.user)
+        else
+          req.user.getGroups().then (groups)->
+            rv.groups = (g.id for g in groups)
+            res.json(rv)
+            userHooks.afterUpdate(req.user)
+
     if req.body.password
       req.user.rawpwd = req.body.password if req.body.password
-      req.body.password = pwdutils.getUnixPwd(req.body.password)
+      pwdutils.getUnixPwd req.body.password, (unixPwd) ->
+        req.body.password = pwdutils.createMD5Hash(req.body.password)
+        req.body.unixpwd = unixPwd
+        _save()
     else
       delete req.body.password
-
-    req.user.updateAttributes(req.body).then () ->
-      rv = req.user.toJSON()
-      if req.body.groups and req.body.groups.length > 0
-        _syncGroups req.user, req.body.groups, (err, groups)->
-          rv.groups = groups
-          res.json(rv)
-          userHooks.afterUpdate(req.user)
-      else
-        req.user.getGroups().then (groups)->
-          rv.groups = (g.id for g in groups)
-          res.json(rv)
-          userHooks.afterUpdate(req.user)
+      _save()
 
 
   destroy: (req, res) ->
