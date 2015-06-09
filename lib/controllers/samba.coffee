@@ -18,7 +18,7 @@ module.exports = (db) ->
     LOGONSHARE = process.env.LOGONSHARE || 'nlogon'
 
     res.write """
-    \\\\#{process.env.LOGONSERVER}\\#{LOGONSHARE}\\#{groupname}.bat
+    call \\\\#{process.env.LOGONSERVER}\\#{LOGONSHARE}\\#{groupname}.bat
 
     """
 
