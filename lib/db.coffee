@@ -10,6 +10,7 @@ if process.env.DATABASE_URL
   sequelize = new Sequelize(process.env.DATABASE_URL, opts)
 else
   # in MEMORY sqlite
+  console.log('## using in memory sqlite')
   sequelize = new Sequelize('database', 'username', 'password',
     dialect: 'sqlite'
   )
@@ -24,6 +25,7 @@ module.exports.init = (modelModules, cb, doSync) ->
 
   db.User.hasMany db.Group, {through: 'usergroup_mship'}
   db.Group.hasMany db.User, {through: 'usergroup_mship'}
+  db.Group.hasOne db.User, {foreignKey: 'gid' }
 
   return cb(null, db) if not doSync
 
