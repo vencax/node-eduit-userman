@@ -28,7 +28,7 @@ module.exports = (db) ->
     ###
     homedir = path.join(HOMES_PATH, uname)
     _do_create_home = () ->
-      mkHome = "cp -R /etc/skel #{homedir}"
+      mkHome = "cp -a /etc/skel/. #{homedir}"
       mkHome += " && chown -R #{uname}:adm #{homedir}"
       mkHome += " && chmod 770 #{homedir}"
       _run_command(mkHome, cb)
