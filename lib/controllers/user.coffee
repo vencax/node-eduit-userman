@@ -23,6 +23,7 @@ module.exports = (db) ->
       req.body.unixpwd = unixPwd
       req.body.hash_method = 'MD5'
       req.body.user = req.body.username
+      req.body.status = 'A'
       db.User.create(req.body).then (created) ->
         rv = created.toJSON()
         _syncGroups created, req.body.groups, (err, groups)->
