@@ -59,9 +59,11 @@ module.exports = (s, request, execenv) ->
         console.log "verifying background commands ..."
         execenv.res[1][0].should.eql "mv /home/gandalf /tmp"
         execenv.res[2][0].should.eql "(echo #{o.password};" +
-          " echo #{o.password}) | smbpasswd -s -a #{o.username}"
-        execenv.res[3][0].should.eql "cp -R /etc/skel /home/gandalf" +
-          " && chown -R gandalf:adm /home/gandalf && chmod 770 /home/gandalf"
+          " echo #{o.password}) | smbpasswd -s -a #{o.username} && " +
+          "pdbedit --modify -u #{o.username} --fullname \"#{o.realname}\""
+        execenv.res[3][0].should.eql "cp -R /etc/skel /home/#{o.username}" +
+          " && chown -R #{o.username}:adm /home/#{o.username} && " +
+          "chmod 770 /home/#{o.username}"
         done()
       , 800
 
@@ -136,7 +138,7 @@ module.exports = (s, request, execenv) ->
       res.statusCode.should.eql 200
       execenv.res[0][0].should.eql "tar -czf /tmp/gandalf.tgz /home/gandalf " +
         "&& rm -rf /home/gandalf"
-      execenv.res[1][0].should.eql "smbpasswd -x gandalf"
+      execenv.res[1][0].should.eql "pdbedit --delete -u gandalf"
       setTimeout () ->
         done()
       , 1800
