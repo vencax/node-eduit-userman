@@ -61,7 +61,7 @@ module.exports = (s, request, execenv) ->
         execenv.res[2][0].should.eql "(echo #{o.password};" +
           " echo #{o.password}) | smbpasswd -s -a #{o.username} && " +
           "pdbedit --modify -u #{o.username} --fullname \"#{o.realname}\""
-        execenv.res[3][0].should.eql "cp -R /etc/skel /home/#{o.username}" +
+        execenv.res[3][0].should.eql "cp -a /etc/skel/. /home/#{o.username}" +
           " && chown -R #{o.username}:adm /home/#{o.username} && " +
           "chmod 770 /home/#{o.username}"
         done()
