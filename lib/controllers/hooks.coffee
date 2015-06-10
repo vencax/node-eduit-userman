@@ -14,6 +14,7 @@ module.exports = (db) ->
 
 
   _run_command = (cmd, cb) ->
+    console.log cmd
     child = exec cmd, (err, stdout, stderr) ->
       return cb(err) if err and cb
       return cb(null, stdout) if cb
