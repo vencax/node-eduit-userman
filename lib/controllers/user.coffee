@@ -21,6 +21,8 @@ module.exports = (db) ->
     pwdutils.getUnixPwd req.body.password, (unixPwd) ->
       req.body.password = pwdutils.createMD5Hash(req.body.password)
       req.body.unixpwd = unixPwd
+      req.body.hash_method = 'MD5'
+      req.body.user = req.body.username
       db.User.create(req.body).then (created) ->
         rv = created.toJSON()
         _syncGroups created, req.body.groups, (err, groups)->
