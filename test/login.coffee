@@ -67,6 +67,8 @@ module.exports = (s, request, execenv) ->
       body = JSON.parse(body)
       body.username.should.eql o.username
       should.exist body.token
+      should.exist body.groups
+      body.groups.length.should.eql 2
       done()
 
   # check

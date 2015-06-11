@@ -25,7 +25,9 @@ module.exports = (db) ->
         )
         delete (profile.password)
 
-        res.json profile
+        found.getGroups().then (groups)->
+          profile.groups = (g.id for g in groups)
+          res.json profile
 
     .catch (err) ->
       res.send 401, err
