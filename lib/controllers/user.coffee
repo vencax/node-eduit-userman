@@ -1,5 +1,6 @@
 
 pwdutils = require('./pwdutils')
+emailDomain = process.env.DEFAULT_EMAIL_DOMAIN
 
 module.exports = (db) ->
 
@@ -24,6 +25,9 @@ module.exports = (db) ->
       req.body.hash_method = 'MD5'
       req.body.user = req.body.username
       req.body.status = 'A'
+      if not ('email' of req.body) and emailDomain?
+        # autofill organisation's email
+        req.body.email = "#{req.body.username}@#{emailDomain}"
       db.User.create(req.body).then (created) ->
         rv = created.toJSON()
         _syncGroups created, req.body.groups, (err, groups)->

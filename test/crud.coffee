@@ -142,3 +142,21 @@ module.exports = (s, request, execenv) ->
       setTimeout () ->
         done()
       , 1800
+
+  it "should create new user with autocreated email", (done) ->
+    o = _getObj()
+    o.username = 'radagast'
+    delete o.email
+    this.timeout(0)
+
+    request 'POST', "#{s}/user/", o, (err, res, body) ->
+      return done err if err
+      res.statusCode.should.eql 201
+      res.should.be.json
+      body = JSON.parse(body)
+      console.log "created user: #{JSON.stringify(created)}"
+      should.exist body.id
+      should.not.exist body.password
+      body.username.should.eql o.username
+      body.email.should.eql "#{o.username}@mordor.cz"
+      done()

@@ -14,6 +14,7 @@ process.env.SERVER_SECRET='jfdlksjflaf'
 process.env.PWD_SALT='p9Tkr6uqxKtf'
 process.env.DONT_PROTECT=true
 process.env.LOGONSERVER='mordor'
+process.env.DEFAULT_EMAIL_DOMAIN = 'mordor.cz'
 # process.env.DATABASE_URL='mysql://pgina:heslo77@localhost:5000/pgina'
 # process.env.DATABASE_URL='sqlite://db.sqlite'
 
