@@ -36,4 +36,4 @@ exports.getUnixPwd = (rawPwd, cb) ->
 exports.unixPwdMatch = (rawpwd, hash, cb) ->
   c = "python -c 'import crypt; print crypt.crypt(\"#{rawpwd}\", \"#{hash}\")'"
   child = exec c, (err, stdout, stderr) ->
-    return cb(stdout.indexOf(hash) == 0)
+    return cb(stdout.indexOf(hash) == 0) if cb?
