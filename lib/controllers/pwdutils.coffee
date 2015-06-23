@@ -33,7 +33,20 @@ exports.getUnixPwd = (rawPwd, cb) ->
     return cb(stdout)
 
 
-exports.unixPwdMatch = (rawpwd, hash, cb) ->
+exports.unixPwdMatch = _unixPwdMatch = (rawpwd, hash, cb) ->
   c = "python -c 'import crypt; print crypt.crypt(\"#{rawpwd}\", \"#{hash}\")'"
   child = exec c, (err, stdout, stderr) ->
     return cb(stdout.indexOf(hash) == 0) if cb?
+
+
+exports.do_login = (usermodel, uname, pass, cb) ->
+  usermodel.find({where: {username: uname}}).then (found) ->
+    return cb("WRONG_CREDENTIALS") unless found
+
+    _unixPwdMatch pass, found.unixpwd, (matching) ->
+      return cb("WRONG_CREDENTIALS") if not matching
+
+      delete (found.password)
+      cb(null, found)
+  .catch (err) ->
+    cb(err)

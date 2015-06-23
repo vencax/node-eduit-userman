@@ -9,6 +9,7 @@ module.exports = (app, db, sendMail) ->
 
   authRoutes = authM(db)
   app.post "/login", authRoutes.login
+  app.post "/ginalogin", authRoutes.ginalogin
   app.post "/check", authRoutes.check
   sambaRoutes = sambaM(db)
   app.get "/logonscript/:uname", sambaRoutes.logonScript

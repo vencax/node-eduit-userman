@@ -12,25 +12,41 @@ module.exports = (db) ->
   login: (req, res) ->
     return _sendError(res)  unless req.body.password
 
-    # We are sending the profile inside the token
-    db.User.find({where: {username: req.body.username}}).then (found) ->
-      return _sendError(res)  unless found
+    pwdutils.do_login db.User, \
+    req.body.username, req.body.password, (err, found) ->
+      return res.status(401).send(err) if err
 
-      pwdutils.unixPwdMatch req.body.password, found.unixpwd, (matching) ->
-        return _sendError(res) if not matching
-
+      found.getGroups().then (groups)->
         profile = JSON.parse(JSON.stringify(found))
+        profile.groups = (g.id for g in groups)
+
+        # We are sending the profile inside the token
         profile.token = jwt.sign(profile, process.env.SERVER_SECRET,
           expiresInMinutes: 60 * 5
         )
-        delete (profile.password)
+        res.json profile
 
-        found.getGroups().then (groups)->
-          profile.groups = (g.id for g in groups)
-          res.json profile
 
-    .catch (err) ->
-      res.send 401, err
+  ginalogin: (req, res) ->
+    return _sendError(res)  unless req.body.password
+
+    pwdutils.do_login db.User, \
+    req.body.username, req.body.password, (err, found) ->
+      return res.status(401).send(err) if err
+
+      found.getGroups().then (groups)->
+        grps = (g.name for g in groups)
+        # GID as well
+        db.Group.find({where: {id: found.gid}}).then (GID) ->
+          grps.push(GID.name)
+          grps.join(';')
+          profile = JSON.parse(JSON.stringify(found))
+
+          res.status(200).send """\n#{profile.username}
+#{profile.realname}
+#{profile.email}
+#{grps}"""
+
 
   check: (req, res) ->
     db.User.find({where: {username: req.body.username}}).then (found) ->

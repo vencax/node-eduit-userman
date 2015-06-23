@@ -7,8 +7,7 @@ module.exports = (s, request, execenv) ->
   _getObj = ->
     user =
       username: 'gandalf2'
-      first_name: 'gandalf'
-      last_name: 'the gray'
+      realname: 'gandalf the gray'
       email: 'g@nda.lf'
       password: 'secretwhisper'
       gid: 2
@@ -103,4 +102,21 @@ module.exports = (s, request, execenv) ->
       body.indexOf("group 0").should.be.above 0
       body.indexOf("group 1").should.be.above 0
       body.indexOf("group 2").should.be.above 0
+      done()
+
+  it "must return logon information for gina login", (done) ->
+    o = _getObj()
+
+    request "POST", "#{s}/ginalogin/", o, (err, res, body) ->
+      return done err if err
+      res.statusCode.should.eql 200
+      parts = body.split('\n')
+      console.log parts
+      parts[0].should.eql ""
+      parts[1].should.eql o.username
+      parts[2].should.eql o.realname
+      parts[3].should.eql o.email
+      parts[4].indexOf("group 0").should.be.above -1
+      parts[4].indexOf("group 1").should.be.above -1
+      parts[4].indexOf("group 2").should.be.above -1
       done()
