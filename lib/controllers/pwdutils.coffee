@@ -11,10 +11,6 @@ algorithm = "pbkdf2_sha256"
 iterations = 10000
 
 
-exports.createMD5Hash = (pwd) ->
-  return crypto.createHash('md5').update(pwd).digest('hex')
-
-
 exports.django_pwd_match = (key, djpwd) ->
   parts = djpwd.split("$")
   iterations = parts[1]

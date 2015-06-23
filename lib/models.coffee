@@ -17,8 +17,6 @@ module.exports = (sequelize, DataTypes) ->
     password: DataTypes.STRING
     status: DataTypes.STRING
     gid_id: DataTypes.INTEGER
-    user: DataTypes.STRING
-    hash_method: DataTypes.STRING
     unixpwd: DataTypes.STRING
   ,
     tableName: "users"

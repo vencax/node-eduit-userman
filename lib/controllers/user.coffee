@@ -20,10 +20,7 @@ module.exports = (User, Group) ->
       return res.status(400).send("REQUIRED_PARAM_MISSING")
     rawpwd = req.body.password
     pwdutils.getUnixPwd req.body.password, (unixPwd) ->
-      req.body.password = pwdutils.createMD5Hash(req.body.password)
       req.body.unixpwd = unixPwd
-      req.body.hash_method = 'MD5'
-      req.body.user = req.body.username
       req.body.status = 'A'
       if not ('email' of req.body) and emailDomain?
         # autofill organisation's email
@@ -71,7 +68,6 @@ module.exports = (User, Group) ->
     if req.body.password
       req.user.rawpwd = req.body.password if req.body.password
       pwdutils.getUnixPwd req.body.password, (unixPwd) ->
-        req.body.password = pwdutils.createMD5Hash(req.body.password)
         req.body.unixpwd = unixPwd
         _save()
     else
