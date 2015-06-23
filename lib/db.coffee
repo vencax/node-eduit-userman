@@ -17,25 +17,10 @@ else
 
 module.exports.init = (modelModules, cb, doSync) ->
 
-  db = {sequelize: sequelize}
-
   for mod in modelModules
-    for modelName, model of mod(sequelize, Sequelize)
-      db[modelName] = model
+    mod(sequelize, Sequelize)
 
-  db.User.hasMany db.Group, {through: 'usergroup_mship'}
-  db.Group.hasMany db.User, {through: 'usergroup_mship'}
-  db.Group.hasOne db.User, {foreignKey: 'gid' }
+  return cb(null, sequelize) if not doSync
 
-  return cb(null, db) if not doSync
-
-  db.sequelize.sync().then () ->
-    return cb(null, db)
-
-  # migrator = sequelize.getMigrator
-  #   path:        __dirname + '/migrations'
-  #   filesFilter: /\.coffee$/
-  # migrator.migrate({ method: 'up' }).then () ->
-  #   cb(null, db)
-  # .catch (err) ->
-  #   cb('Unable to sync database: ' + err)
+  sequelize.sync().then () ->
+    return cb(null, sequelize)

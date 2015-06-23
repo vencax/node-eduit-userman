@@ -7,16 +7,16 @@ sambaM = require("./controllers/samba")
 
 module.exports = (app, db, sendMail) ->
 
-  authRoutes = authM(db)
+  authRoutes = authM(db.models.User, db.models.Group)
   app.post "/login", authRoutes.login
   app.post "/ginalogin", authRoutes.ginalogin
   app.post "/check", authRoutes.check
-  sambaRoutes = sambaM(db)
+  sambaRoutes = sambaM(db.models.User, db.models.Group)
   app.get "/logonscript/:uname", sambaRoutes.logonScript
 
   # create the routes
-  app.resource "user", userM(db)
-  app.resource "group", groupM(db)
+  app.resource "user", userM(db.models.User, db.models.Group)
+  app.resource "group", groupM(db.models.User, db.models.Group)
 
   # catcher of auth excepts
   app.use (err, req, res, next) ->

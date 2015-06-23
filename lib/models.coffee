@@ -1,7 +1,7 @@
 
 module.exports = (sequelize, DataTypes) ->
 
-  User: sequelize.define "User",
+  User = sequelize.define "User",
     username:
       type: DataTypes.STRING
       allowNull: false
@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) ->
     tableName: "users"
 
 
-  Group: sequelize.define "Group",
+  Group = sequelize.define "Group",
     name:
       type: DataTypes.STRING
       allowNull: false
@@ -32,3 +32,8 @@ module.exports = (sequelize, DataTypes) ->
     status: DataTypes.STRING
   ,
     tableName: "groups"
+
+
+  User.hasMany Group, {through: 'usergroup_mship'}
+  Group.hasMany User, {through: 'usergroup_mship'}
+  Group.hasOne User, {foreignKey: 'gid' }

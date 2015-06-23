@@ -1,6 +1,6 @@
 
 
-module.exports = (db) ->
+module.exports = (User, Group) ->
 
   _writeCommon = (res) ->
     res.write """
@@ -24,10 +24,10 @@ module.exports = (db) ->
 
   logonScript: (req, res) ->
     _writeCommon(res)
-    db.User.find({where: {username: req.params.uname}}).then (found) ->
+    User.find({where: {username: req.params.uname}}).then (found) ->
       return res.status(404) if not found
 
-      db.Group.find({where: {id: found.gid}}).then (gid) ->
+      Group.find({where: {id: found.gid}}).then (gid) ->
         _writeGroupScript(res, gid.name)
 
         found.getGroups().then (groups)->

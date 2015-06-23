@@ -1,16 +1,16 @@
 
 
-module.exports = (db) ->
+module.exports = (User, Group) ->
 
   index: (req, res) ->
-    db.Group.findAll().then (found) ->
+    Group.findAll().then (found) ->
       res.json found
 
 
   create: (req, res, next) ->
     if not req.body.name
       return res.status(400).send("missing required param: name")
-    db.Group.create(req.body).then (created) ->
+    Group.create(req.body).then (created) ->
       res.status(201).send created
     .catch (err) ->
       res.status(400).send err
@@ -33,5 +33,5 @@ module.exports = (db) ->
 
   # actual object loading function (loads based on req url params)
   load: (id, fn) ->
-    db.Group.find({where: {id: id}}).then (found) ->
+    Group.find({where: {id: id}}).then (found) ->
       return fn null, found

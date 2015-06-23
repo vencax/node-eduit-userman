@@ -3,7 +3,7 @@ jwt = require("jsonwebtoken")
 pwdutils = require("./pwdutils")
 
 
-module.exports = (db) ->
+module.exports = (User, Group) ->
 
   _sendError = (res) ->
     res.status(401).send("WRONG_CREDENTIALS")
@@ -12,7 +12,7 @@ module.exports = (db) ->
   login: (req, res) ->
     return _sendError(res)  unless req.body.password
 
-    pwdutils.do_login db.User, \
+    pwdutils.do_login User, \
     req.body.username, req.body.password, (err, found) ->
       return res.status(401).send(err) if err
 
@@ -30,14 +30,14 @@ module.exports = (db) ->
   ginalogin: (req, res) ->
     return _sendError(res)  unless req.body.password
 
-    pwdutils.do_login db.User, \
+    pwdutils.do_login User, \
     req.body.username, req.body.password, (err, found) ->
       return res.status(401).send(err) if err
 
       found.getGroups().then (groups)->
         grps = (g.name for g in groups)
         # GID as well
-        db.Group.find({where: {id: found.gid}}).then (GID) ->
+        Group.find({where: {id: found.gid}}).then (GID) ->
           grps.push(GID.name)
           grps.join(';')
           profile = JSON.parse(JSON.stringify(found))
@@ -49,7 +49,7 @@ module.exports = (db) ->
 
 
   check: (req, res) ->
-    db.User.find({where: {username: req.body.username}}).then (found) ->
+    User.find({where: {username: req.body.username}}).then (found) ->
       return res.json [] if not found
       res.json [1]
     .catch () ->

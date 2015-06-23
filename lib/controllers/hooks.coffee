@@ -10,7 +10,7 @@ HOMES_PATH = process.env.HOMES_PATH || '/home'
 PGINA_HACKS = process.env.PGINA_HACKS || true
 
 
-module.exports = (db) ->
+module.exports = () ->
 
 
   _run_command = (cmd, cb) ->

@@ -2,12 +2,12 @@
 pwdutils = require('./pwdutils')
 emailDomain = process.env.DEFAULT_EMAIL_DOMAIN
 
-module.exports = (db) ->
+module.exports = (User, Group) ->
 
-  userHooks = require('./hooks')(db)  # user hooks
+  userHooks = require('./hooks')()  # user hooks
 
   index: (req, res) ->
-    db.User.findAll()
+    User.findAll()
       # include: [{ model: db.UserGroup, as: 'groups' }]
     .then (found) ->
       for f in found
@@ -28,7 +28,7 @@ module.exports = (db) ->
       if not ('email' of req.body) and emailDomain?
         # autofill organisation's email
         req.body.email = "#{req.body.username}@#{emailDomain}"
-      db.User.create(req.body).then (created) ->
+      User.create(req.body).then (created) ->
         rv = created.toJSON()
         _syncGroups created, req.body.groups, (err, groups)->
           rv.groups = groups
@@ -87,7 +87,7 @@ module.exports = (db) ->
 
   # actual object loading function (loads based on req url params)
   load: (id, fn) ->
-    db.User.find({where: {id: id}}).then (found) ->
+    User.find({where: {id: id}}).then (found) ->
       return fn null, found
 
 # ----------------
