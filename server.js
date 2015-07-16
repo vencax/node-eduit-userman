@@ -23,7 +23,7 @@ require('./lib/db').init(modelModules, function(err, sequelize) {
   api.use(cors({maxAge: 86400}));
   // secure API
   var unprotected = [
-    '/login', '/check', /\/logonscript\/.*$/
+    '/login', '/ginalogin', '/check', /\/logonscript\/.*$/
   ];
   // the rest of API secure with JWT
   api.use(
