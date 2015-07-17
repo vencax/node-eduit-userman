@@ -39,13 +39,12 @@ module.exports = (User, Group) ->
         # GID as well
         Group.find({where: {id: found.gid}}).then (GID) ->
           grps.push(GID.name)
-          grps.join(';')
           profile = JSON.parse(JSON.stringify(found))
 
           res.status(200).send """\n#{profile.username}
 #{profile.realname}
 #{profile.email}
-#{grps}"""
+#{grps.join(';')}"""
 
 
   check: (req, res) ->
