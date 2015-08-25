@@ -3,24 +3,18 @@
 module.exports = (User, Group) ->
 
   _writeCommon = (res) ->
-    res.write """
-    rem delete all existing connections
-    net use * /delete /y
-
-    rem wait 3 secs
-    ping 1.1.1.0 -w 1 -n 2 > NUL
-
-    net use H: \\\\#{process.env.LOGONSERVER}\\%USERNAME%
-
-    """
+    res.write "net use * /delete /y"
+    res.write "\r\n"
+    res.write "ping 1.1.1.0 -w 1 -n 2 > NUL"
+    res.write "\r\n"
+    res.write "net use H: \\\\#{process.env.LOGONSERVER}\\%USERNAME%"
+    res.write "\r\n"
 
   _writeGroupScript = (res, groupname) ->
     LOGONSHARE = process.env.LOGONSHARE || 'nlogon'
 
-    res.write """
-    call \\\\#{process.env.LOGONSERVER}\\#{LOGONSHARE}\\#{groupname}.bat
-
-    """
+    res.write "CALL \\\\#{process.env.LOGONSERVER}\\#{LOGONSHARE}\\#{groupname}.bat"
+    res.write "\r\n"
 
   logonScript: (req, res) ->
     _writeCommon(res)
