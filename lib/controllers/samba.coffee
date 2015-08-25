@@ -12,8 +12,9 @@ module.exports = (User, Group) ->
 
   _writeGroupScript = (res, groupname) ->
     LOGONSHARE = process.env.LOGONSHARE || 'nlogon'
+    LOGONPATH = "#{process.env.LOGONSERVER}\\#{LOGONSHARE}"
 
-    res.write "CALL \\\\#{process.env.LOGONSERVER}\\#{LOGONSHARE}\\#{groupname}.bat"
+    res.write "CALL \\\\#{LOGONPATH}\\#{groupname}.bat"
     res.write "\r\n"
 
   logonScript: (req, res) ->

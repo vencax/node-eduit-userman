@@ -20,6 +20,7 @@ process.env.DEFAULT_EMAIL_DOMAIN = 'mordor.cz'
 
 execenv =
   res: []
+  stdout: 'ahoj'
 
 child_process_moc = horaa('child_process')
 child_process_moc.hijack 'exec', (prog, pars, cb) ->
