@@ -26,10 +26,11 @@ exports.create_django_hash = (pwd) ->
 exports.getUnixPwd = (rawPwd, cb) ->
   cmd = "python -c 'import crypt; print crypt.crypt(\"#{rawPwd}\", \"ds\")'"
   child = exec cmd, (err, stdout, stderr) ->
-    return cb(stdout)
+    return cb(stdout.replace('\n', ''))
 
 
 exports.unixPwdMatch = _unixPwdMatch = (rawpwd, hash, cb) ->
+  hash = hash.replace('\n', '')
   c = "python -c 'import crypt; print crypt.crypt(\"#{rawpwd}\", \"#{hash}\")'"
   child = exec c, (err, stdout, stderr) ->
     return cb(stdout.indexOf(hash) == 0) if cb?
