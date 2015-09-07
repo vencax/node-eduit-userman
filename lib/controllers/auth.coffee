@@ -1,7 +1,7 @@
 
 jwt = require("jsonwebtoken")
 pwdutils = require("./pwdutils")
-TOKENVALIDITYDURATION = process.env.TOKEN_VALIDITY_IN_MINS || 60 * 24;
+TOKENVALIDITYDURATION = process.env.TOKEN_VALIDITY_IN_MINS || 60 * 24
 
 
 module.exports = (User, Group) ->

@@ -51,6 +51,7 @@ module.exports = () ->
       _run_command "(echo #{user.rawpwd}; echo #{user.rawpwd}) | " + \
         "smbpasswd -s -a #{user.username} && " +
         "pdbedit --modify -u #{user.username} --fullname \"#{user.realname}\""
+      _run_command(SAMBARELOAD)
       console.log("user #{user.username} synced")
     , 500
 
@@ -58,15 +59,17 @@ module.exports = () ->
   afterUpdate: (user) ->
     # change realname of da samba user
     # see: http://www.samba.org/samba/docs/man/manpages/pdbedit.8.html
-    cmd = "pdbedit --modify -u #{user.username}"
+    cmd = ""
     if user.realname?
-      cmd += " --fullname \"#{user.realname}\""
-
+      cmd = "pdbedit --modify -u #{user.username} --fullname \"#{user.realname}\""
     if user.rawpwd
-      cmd += " && (echo #{user.rawpwd}; echo #{user.rawpwd}) | " + \
+      if cmd.length
+        cmd += " && "
+      cmd += "(echo #{user.rawpwd}; echo #{user.rawpwd}) | " + \
         "smbpasswd -s #{user.username}"
 
     _run_command(cmd)
+    _run_command(SAMBARELOAD)
 
 
   afterDestroy: (user) ->
