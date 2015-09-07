@@ -1,6 +1,7 @@
 
 jwt = require("jsonwebtoken")
 pwdutils = require("./pwdutils")
+TOKENVALIDITYDURATION = process.env.TOKEN_VALIDITY_IN_MINS || 60 * 24;
 
 
 module.exports = (User, Group) ->
@@ -12,8 +13,7 @@ module.exports = (User, Group) ->
   login: (req, res) ->
     return _sendError(res)  unless req.body.password
 
-    pwdutils.do_login User, \
-    req.body.username, req.body.password, (err, found) ->
+    pwdutils.do_login User, req.body.username, req.body.password, (err, found) ->
       return res.status(401).send(err) if err
 
       found.getGroups().then (groups)->
@@ -22,7 +22,7 @@ module.exports = (User, Group) ->
 
         # We are sending the profile inside the token
         profile.token = jwt.sign(profile, process.env.SERVER_SECRET,
-          expiresInMinutes: 60 * 5
+          expiresInMinutes: TOKENVALIDITYDURATION
         )
         res.json profile
 
@@ -30,8 +30,7 @@ module.exports = (User, Group) ->
   ginalogin: (req, res) ->
     return _sendError(res)  unless req.body.password
 
-    pwdutils.do_login User, \
-    req.body.username, req.body.password, (err, found) ->
+    pwdutils.do_login User, req.body.username, req.body.password, (err, found) ->
       return res.status(401).send(err) if err
 
       found.getGroups().then (groups)->
