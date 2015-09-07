@@ -8,6 +8,7 @@ exec = require('child_process').exec
 DELETE_HOME_ON_DELETION = process.env.DELETE_HOME_ON_DELETION || true
 HOMES_PATH = process.env.HOMES_PATH || '/home'
 PGINA_HACKS = process.env.PGINA_HACKS || true
+SAMBARELOAD = process.env.SAMBA_RELOAD_CMD || 'service smbd reload'
 
 
 module.exports = () ->
@@ -55,16 +56,17 @@ module.exports = () ->
 
 
   afterUpdate: (user) ->
-    if user.rawpwd
-      _run_command "(echo #{user.rawpwd}; echo #{user.rawpwd}) | " + \
-        "smbpasswd -s #{user.username}"
-
     # change realname of da samba user
     # see: http://www.samba.org/samba/docs/man/manpages/pdbedit.8.html
-    modFullname = "pdbedit --modify -u #{user.username}"
+    cmd = "pdbedit --modify -u #{user.username}"
     if user.realname?
-      modFullname += " --fullname \"#{user.realname}\""
-    _run_command(modFullname)
+      cmd += " --fullname \"#{user.realname}\""
+
+    if user.rawpwd
+      cmd += " && (echo #{user.rawpwd}; echo #{user.rawpwd}) | " + \
+        "smbpasswd -s #{user.username}"
+
+    _run_command(cmd)
 
 
   afterDestroy: (user) ->
