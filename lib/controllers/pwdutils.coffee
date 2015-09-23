@@ -4,7 +4,7 @@ bcrypt = require "bcrypt"
 crypto = require('crypto')
 exec = require('child_process').exec
 
-
+WRONGCREDS = process.env.WRONGCREDS || "WRONG_CREDENTIALS"
 throw new Error("SET process.env.PWD_SALT!") unless "PWD_SALT" of process.env
 salt = process.env.PWD_SALT
 algorithm = "pbkdf2_sha256"
@@ -38,10 +38,10 @@ exports.unixPwdMatch = _unixPwdMatch = (rawpwd, hash, cb) ->
 
 exports.do_login = (usermodel, uname, pass, cb) ->
   usermodel.find({where: {username: uname}}).then (found) ->
-    return cb("WRONG_CREDENTIALS") unless found
+    return cb(WRONGCREDS) unless found
 
     _unixPwdMatch pass, found.unixpwd, (matching) ->
-      return cb("WRONG_CREDENTIALS") if not matching
+      return cb(WRONGCREDS) if not matching
 
       delete (found.password)
       cb(null, found)
