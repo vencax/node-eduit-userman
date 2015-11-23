@@ -120,3 +120,21 @@ module.exports = (s, request, execenv) ->
       parts[4].indexOf("group 1").should.be.above -1
       parts[4].indexOf("group 2").should.be.above -1
       done()
+
+  it "must change password through gina login", (done) ->
+    newPwd = 'holycow!'
+    o = _getObj()
+    o.old = o.password
+    o.password = newPwd
+
+    request "POST", "#{s}/ginalogin/", o, (err, res, body) ->
+      return done err if err
+      res.statusCode.should.eql 200
+
+      delete o.old
+      # now we shall be able to login with the new owd
+      request "POST", "#{s}/ginalogin/", o, (err, res, body) ->
+        return done err if err
+        res.statusCode.should.eql 200
+        console.log body
+        done()

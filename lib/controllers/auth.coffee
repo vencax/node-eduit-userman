@@ -30,6 +30,11 @@ module.exports = (User, Group) ->
   ginalogin: (req, res) ->
     return _sendError(res)  unless req.body.password
 
+    if req.body.old
+      return pwdutils.handle_pwd_change User, req.body.username, req.body.password, req.body.old, (err, found) ->
+        return res.status(401).send(err) if err
+        res.status(200).send('password changed')
+
     pwdutils.do_login User, req.body.username, req.body.password, (err, found) ->
       return res.status(401).send(err) if err
 

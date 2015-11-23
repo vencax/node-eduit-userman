@@ -36,7 +36,7 @@ exports.unixPwdMatch = _unixPwdMatch = (rawpwd, hash, cb) ->
     return cb(stdout.indexOf(hash) == 0) if cb?
 
 
-exports.do_login = (usermodel, uname, pass, cb) ->
+exports.do_login = _do_login = (usermodel, uname, pass, cb) ->
   usermodel.find({where: {username: uname}}).then (found) ->
     return cb(WRONGCREDS) unless found
 
@@ -47,3 +47,10 @@ exports.do_login = (usermodel, uname, pass, cb) ->
       cb(null, found)
   .catch (err) ->
     cb(err)
+
+exports.handle_pwd_change = (usermodel, uname, pass, oldpass, cb) ->
+  _do_login usermodel, uname, oldpass, (err, user)->
+    return cb(err) if err
+    user.password = pass
+    user.save().then (saved)->
+      cb(null)
