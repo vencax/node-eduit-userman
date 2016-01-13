@@ -27,7 +27,7 @@ def createMships(user, cur):
         sysGId = authGroupId2sysGroupId(ag['group_id'], cur)
         mship.add(sysGId)
 
-    gid = user['gid'] or user['gid_id'] or None
+    gid = user.get('gid', None) or user.get('gid_id', None)
     # kdyby byl GID none a existovali mships, tak se popne a da do GID
     if gid is None and len(mship) > 0:
         gid = mship.pop()
@@ -52,9 +52,9 @@ def processUser(user, cur):
     cur.execute("""INSERT INTO users
     (
         id, username, realname, email, gid, password,
-        status, user, hash_method, unixpwd, createdAt, updatedAt
+        status, unixpwd, createdAt, updatedAt
     )
-    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """, (
         user['user_id'],
         user['username'],
@@ -63,8 +63,6 @@ def processUser(user, cur):
         gid,
         user['o.password'],
         user['status'],
-        user['user'],
-        user['hash_method'],
         user['unixpwd'],
         user['date_joined'],
         user['last_login']
@@ -79,7 +77,7 @@ def processUser(user, cur):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    conn = mdb.connect('192.168.1.1', 'pgina', 'heslo77', 'novapgina')
+    conn = mdb.connect('10.0.0.2', 'pgina', '1234', 'eduit')
 
     cur = conn.cursor(mdb.cursors.DictCursor)
 
