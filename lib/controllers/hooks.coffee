@@ -56,6 +56,12 @@ module.exports = () ->
     , 500
 
 
+  changeSmbPwd: (user, rawpwd) ->
+    cmd = "(echo #{rawpwd}; echo #{rawpwd}) | smbpasswd -s #{user.username}"
+    _run_command(cmd)
+    _run_command(SAMBARELOAD)
+
+
   afterUpdate: (user) ->
     # change realname of da samba user
     # see: http://www.samba.org/samba/docs/man/manpages/pdbedit.8.html
